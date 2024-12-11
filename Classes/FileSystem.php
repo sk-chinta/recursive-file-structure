@@ -11,6 +11,10 @@ class FileSystem extends Dbh {
     $this->utility = new Utility();
   }
 
+  public function scanAndRecordFileSystem($directoryPath) {
+    $this->scanDirectory($directoryPath);
+    $this->recordFromFile($this->outputFile);
+  }
 
   public function scanDirectory($directoryPath) {
     // Open the file for writing
@@ -34,7 +38,6 @@ class FileSystem extends Dbh {
         die("Invalid directory: {$directoryPath}");
     }
     // Write the current directory path (base directory) first
-
     if($normalizedDirectory === getcwd()){
       fwrite($fileHandle, $this->utility->formatFilePath($normalizedDirectory) . PHP_EOL);
     }
