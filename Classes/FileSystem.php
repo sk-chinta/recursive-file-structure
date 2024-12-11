@@ -12,6 +12,23 @@ class FileSystem extends Dbh {
   }
 
 
+  public function recordFromFile($filename) {
+    if (!file_exists($filename)) {
+        die("File not found: $filename");
+    }
+
+    $lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {      
+      // Only process paths that are within the current directory
+      // Ensure the path starts with the current directory
+      if (strpos($line, $this->currentDir) === 0) {
+        $this->insertPath($line, $this->currentDir);
+      }
+    }
+
+    echo "File structure recorded successfully into the database.";
+  }
+
   private function insertPath($path, $baseDirectory) {
     $relativePath = str_replace($baseDirectory, '', $path); // Get the relative path
     $segments = explode(DIRECTORY_SEPARATOR, $relativePath); // Split into parts
