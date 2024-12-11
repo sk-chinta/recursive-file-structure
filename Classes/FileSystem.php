@@ -12,6 +12,47 @@ class FileSystem extends Dbh {
   }
 
 
+  public function scanDirectory($directoryPath) {
+    // Open the file for writing
+    $fileHandle = fopen($this->outputFile, 'w');
+    if (!$fileHandle) {
+        die("Unable to open file for writing: {$this->outputFile}");
+    }
+
+    // Start processing the directory
+    $this->processDirectory($directoryPath, $fileHandle, $directoryPath);
+
+    // Close the file
+    fclose($fileHandle);
+    echo "File structure written to {$this->outputFile} successfully.";
+  }
+
+  private function processDirectory($directoryPath, $fileHandle, $basePath) {
+    // Normalize the directory path
+    $normalizedDirectory = realpath($directoryPath);
+    if (!$normalizedDirectory || !is_dir($normalizedDirectory)) {
+        die("Invalid directory: {$directoryPath}");
+    }
+    // Write the current directory path (base directory) first
+
+    if($normalizedDirectory === getcwd()){
+      fwrite($fileHandle, $this->utility->formatFilePath($normalizedDirectory) . PHP_EOL);
+    }
+
+     // Scan the directory
+     $entries = array_diff(scandir($normalizedDirectory), ['.', '..']);
+     foreach ($entries as $entry) {
+      $path = $this->utility->joinPaths($normalizedDirectory, $entry);
+      // Write the full path relative to the base path
+      fwrite($fileHandle, $path . PHP_EOL);
+
+      // If it's a directory, process recursively
+      if (is_dir($path)) {
+          $this->processDirectory($path, $fileHandle, $basePath);
+      }
+     }
+  }
+
   public function recordFromFile($filename) {
     if (!file_exists($filename)) {
         die("File not found: $filename");
