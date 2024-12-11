@@ -2,13 +2,14 @@
 require_once 'Utility.php';
 
 class FileSystem extends Dbh {
-  private $outputFile = 'file_structure_output.txt';
+  private $outputFile;
   private $currentDir;
   private $utility;
 
   public function __construct($currentDir){
     $this->currentDir = $currentDir;
     $this->utility = new Utility();
+    $this->outputFile = $this->utility->joinPaths($this->currentDir, 'file_structure_output.txt');
   }
 
   public function scanAndRecordFileSystem($directoryPath) {
