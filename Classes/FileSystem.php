@@ -106,4 +106,12 @@ class FileSystem extends Dbh {
     $stmt->execute(['name' => $name, 'type' => $type, 'path' => $path]);
     return $conn->lastInsertId();
   }
+
+  public function searchPaths($query) {
+    $conn = parent::connect();
+    $stmt = $conn->prepare("SELECT path FROM file_location WHERE path LIKE :query");
+    $searchQuery = "%" . $query . "%";
+    $stmt->execute(['query' => $searchQuery]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }
