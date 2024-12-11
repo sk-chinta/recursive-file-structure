@@ -1,20 +1,18 @@
 <?php
-require_once 'Utility.php';
+require_once './utility/index.php';
 
 class FileSystem extends Dbh {
   private $outputFile;
-  private $currentDir;
   private $utility;
 
-  public function __construct($currentDir){
-    $this->currentDir = $currentDir;
+  public function __construct(){
     $this->utility = new Utility();
-    $this->outputFile = $this->utility->joinPaths($this->currentDir, 'file_structure_output.txt');
+    $this->outputFile = $this->utility->joinPaths(getcwd(), 'file_structure_output.txt');
   }
 
   public function scanAndRecordFileSystem($directoryPath) {
     $this->scanDirectory($directoryPath);
-    $this->recordFromFile($this->outputFile);
+    $this->recordFromFile($this->outputFile, $directoryPath);
   }
 
   public function scanDirectory($directoryPath) {
@@ -57,7 +55,7 @@ class FileSystem extends Dbh {
      }
   }
 
-  public function recordFromFile($filename) {
+  public function recordFromFile($filename, $currentDir) {
     if (!file_exists($filename)) {
         die("File not found: $filename");
     }
@@ -66,8 +64,8 @@ class FileSystem extends Dbh {
     foreach ($lines as $line) {      
       // Only process paths that are within the current directory
       // Ensure the path starts with the current directory
-      if (strpos($line, $this->currentDir) === 0) {
-        $this->insertPath($line, $this->currentDir);
+      if (strpos($line, $currentDir) === 0) {
+        $this->insertPath($line, $currentDir);
       }
     }
 
